@@ -2,7 +2,7 @@ import requests
 from urllib.parse import urljoin
 
 class IfsRequest:
-    def __init__(self, base_url, client_id, client_secret, namespace):
+    def __init__(self, base_url, namespace, client_id, client_secret):
         self.base_url = base_url
         self.client_id = client_id
         self.client_secret = client_secret
