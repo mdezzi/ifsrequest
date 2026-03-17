@@ -1,5 +1,7 @@
-import requests
+import requests, logging
 from urllib.parse import urljoin
+
+logger = logging.getLogger(__name__)
 
 class IfsRequest:
     def __init__(self, base_url, namespace, client_id, client_secret):
@@ -14,10 +16,13 @@ class IfsRequest:
                     "client_id":self.client_id,
                     "client_secret":self.client_secret}
         token_url = urljoin(self.base_url,f'/auth/realms/{self.namespace}/protocol/openid-connect/token')
+        logger.debug('Requesting token from IFS')
         r = requests.post(token_url, data=token_data)
         if r.status_code == 200:
             token = r.json().get('access_token')
+            logger.debug('Token received')
         else:
+            logger.error(f'Did not receive token from IFS. URL: {token_url} Data: {token_data}')
             raise ValueError('Unable to retrieve IFS token. Please check credentials.')
         return token
     
@@ -45,11 +50,13 @@ class IfsRequest:
             headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
             r = requests.get(url, headers=headers)
             if r.status_code == 401:
+                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
                 self.token = self._get_ifs_token()
                 attempts += 1
             else:
                 return r
         else:
+            logger.warning('Reached maximum retries')
             return r
 
     def post(self, url, **kwargs):
@@ -60,11 +67,13 @@ class IfsRequest:
             json = kwargs.get('json',{})
             r = requests.post(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
             if r.status_code == 401:
+                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
                 self.token = self._get_ifs_token()
                 attempts += 1
             else:
                 return r
         else:
+            logger.warning('Reached maximum retries')
             return r
     
     def patch(self, url, **kwargs):
@@ -75,11 +84,13 @@ class IfsRequest:
             json = kwargs.get('json',{})
             r = requests.patch(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
             if r.status_code == 401:
+                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
                 self.token = self._get_ifs_token()
                 attempts += 1
             else:
                 return r
         else:
+            logger.warning('Reached maximum retries')
             return r
 
     def delete(self, url, **kwargs):
@@ -90,10 +101,12 @@ class IfsRequest:
             json = kwargs.get('json',{})
             r = requests.delete(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
             if r.status_code == 401:
+                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
                 self.token = self._get_ifs_token()
                 attempts += 1
             else:
                 return r
         else:
+            logger.warning('Reached maximum retries')
             return r
 
