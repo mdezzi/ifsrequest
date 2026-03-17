@@ -1,1 +1,1 @@
-from ifsrequest.ifsrequest import IfsRequest
+from .ifsrequest import IfsRequest
