@@ -4,18 +4,41 @@ from urllib.parse import urljoin
 logger = logging.getLogger(__name__)
 
 class IfsRequest:
-    def __init__(self, base_url, namespace, client_id, client_secret):
+    def __init__(self, base_url, auth):
         self.base_url = base_url
-        self.client_id = client_id
-        self.client_secret = client_secret
-        self.namespace = namespace
-        self.token = self._get_ifs_token()
+
+        auth_type = auth.get('type')
+        self.auth_type = auth_type.lower()
+        
+        if not auth_type:
+            raise ValueError('Did not receive auth type.')
+        
+        if auth_type.lower() == 'client':
+            logger.debug('Creating CLIENT auth object')
+            client_secret = auth.get('client_secret')
+            client_id = auth.get('client_id')
+            realm = auth.get('realm')
+            if not (client_secret and client_id):
+                raise ValueError('Unable to create IFS Auth. Missing client_id or client_secret')
+            self.client_id = client_id
+            self.client_secret = client_secret
+            self.realm = realm
+            self.token = self._get_ifs_token()
+        elif auth_type.lower() == 'user':
+            username = auth.get('username')
+            password = auth.get('password')
+            if not (username and password):
+                raise ValueError('Unable to create IFS Auth. Missing username or password')
+            self.username = username
+            self.password = password
+        else:
+            raise ValueError(f'Unable to create IFS Auth with auth type [{auth_type.lower()}]')
 
     def _get_ifs_token(self):
         token_data={"grant_type": "client_credentials",
                     "client_id":self.client_id,
                     "client_secret":self.client_secret}
-        token_url = urljoin(self.base_url,f'/auth/realms/{self.namespace}/protocol/openid-connect/token')
+        token_url = urljoin(self.base_url,f'/auth/realms/{self.realm}/protocol/openid-connect/token')
         logger.debug('Requesting token from IFS')
         r = requests.post(token_url, data=token_data)
         if r.status_code == 200:
@@ -45,68 +68,89 @@ class IfsRequest:
 
     def get(self, url, **kwargs):
         url = self._handle_url(url)
-        attempts = 0
-        while attempts < 3:
-            headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
-            r = requests.get(url, headers=headers)
-            if r.status_code == 401:
-                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
-                self.token = self._get_ifs_token()
-                attempts += 1
+        if self.auth_type == 'client':
+            attempts = 0
+            while attempts < 3:
+                headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
+                r = requests.get(url, headers=headers)
+                if r.status_code == 401:
+                    logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
+                    self.token = self._get_ifs_token()
+                    attempts += 1
+                else:
+                    return r
             else:
+                logger.warning('Reached maximum retries')
                 return r
-        else:
-            logger.warning('Reached maximum retries')
-            return r
+        elif self.auth_type == 'user':
+            headers = kwargs.get('headers',{})
+            return requests.get(url, headers=headers)
 
     def post(self, url, **kwargs):
         url = self._handle_url(url)
-        attempts = 0
-        while attempts < 3:
-            headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
+        if self.auth_type == 'client':
+            attempts = 0
+            while attempts < 3:
+                headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
+                json = kwargs.get('json',{})
+                r = requests.post(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+                if r.status_code == 401:
+                    logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
+                    self.token = self._get_ifs_token()
+                    attempts += 1
+                else:
+                    return r
+            else:
+                logger.warning('Reached maximum retries')
+                return r
+        elif self.auth_type == 'user':
+            headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
             r = requests.post(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
-            if r.status_code == 401:
-                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
-                self.token = self._get_ifs_token()
-                attempts += 1
-            else:
-                return r
-        else:
-            logger.warning('Reached maximum retries')
             return r
     
     def patch(self, url, **kwargs):
         url = self._handle_url(url)
-        attempts = 0
-        while attempts < 3:
-            headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
+        if self.auth_type == 'client':
+            attempts = 0
+            while attempts < 3:
+                headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
+                json = kwargs.get('json',{})
+                r = requests.patch(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+                if r.status_code == 401:
+                    logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
+                    self.token = self._get_ifs_token()
+                    attempts += 1
+                else:
+                    return r
+            else:
+                logger.warning('Reached maximum retries')
+                return r
+        elif self.auth_type == 'user':
+            headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
             r = requests.patch(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
-            if r.status_code == 401:
-                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
-                self.token = self._get_ifs_token()
-                attempts += 1
-            else:
-                return r
-        else:
-            logger.warning('Reached maximum retries')
             return r
 
     def delete(self, url, **kwargs):
         url = self._handle_url(url)
-        attempts = 0
-        while attempts < 3:
-            headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
+        if self.auth_type == 'client':
+            attempts = 0
+            while attempts < 3:
+                headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
+                json = kwargs.get('json',{})
+                r = requests.delete(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+                if r.status_code == 401:
+                    logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
+                    self.token = self._get_ifs_token()
+                    attempts += 1
+                else:
+                    return r
+            else:
+                logger.warning('Reached maximum retries')
+                return r
+        elif self.auth_type == 'user':
+            headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
             r = requests.delete(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
-            if r.status_code == 401:
-                logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
-                self.token = self._get_ifs_token()
-                attempts += 1
-            else:
-                return r
-        else:
-            logger.warning('Reached maximum retries')
             return r
-
