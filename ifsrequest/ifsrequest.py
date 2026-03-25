@@ -84,7 +84,7 @@ class IfsRequest:
                 return r
         elif self.auth_type == 'user':
             headers = kwargs.get('headers',{})
-            return requests.get(url, headers=headers)
+            return requests.get(url, headers=headers, auth=(self.username, self.password))
 
     def post(self, url, **kwargs):
         url = self._handle_url(url)
@@ -106,7 +106,7 @@ class IfsRequest:
         elif self.auth_type == 'user':
             headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
-            r = requests.post(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+            r = requests.post(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.get(url, headers=headers, auth=(self.username, self.password))
             return r
     
     def patch(self, url, **kwargs):
@@ -129,7 +129,7 @@ class IfsRequest:
         elif self.auth_type == 'user':
             headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
-            r = requests.patch(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+            r = requests.patch(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.get(url, headers=headers, auth=(self.username, self.password))
             return r
 
     def delete(self, url, **kwargs):
@@ -152,5 +152,5 @@ class IfsRequest:
         elif self.auth_type == 'user':
             headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
-            r = requests.delete(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+            r = requests.delete(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.get(url, headers=headers, auth=(self.username, self.password))
             return r
