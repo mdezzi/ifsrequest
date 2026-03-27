@@ -93,7 +93,7 @@ class IfsRequest:
             while attempts < 3:
                 headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
                 json = kwargs.get('json',{})
-                r = requests.post(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+                r = requests.post(url, json=json, headers=headers) if json else requests.post(url, headers=headers)
                 if r.status_code == 401:
                     logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
                     self.token = self._get_ifs_token()
@@ -106,7 +106,7 @@ class IfsRequest:
         elif self.auth_type == 'user':
             headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
-            r = requests.post(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.get(url, headers=headers, auth=(self.username, self.password))
+            r = requests.post(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.post(url, headers=headers, auth=(self.username, self.password))
             return r
     
     def patch(self, url, **kwargs):
@@ -116,7 +116,7 @@ class IfsRequest:
             while attempts < 3:
                 headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
                 json = kwargs.get('json',{})
-                r = requests.patch(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+                r = requests.patch(url, json=json, headers=headers) if json else requests.patch(url, headers=headers)
                 if r.status_code == 401:
                     logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
                     self.token = self._get_ifs_token()
@@ -129,7 +129,7 @@ class IfsRequest:
         elif self.auth_type == 'user':
             headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
-            r = requests.patch(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.get(url, headers=headers, auth=(self.username, self.password))
+            r = requests.patch(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.patch(url, headers=headers, auth=(self.username, self.password))
             return r
 
     def delete(self, url, **kwargs):
@@ -139,7 +139,7 @@ class IfsRequest:
             while attempts < 3:
                 headers = kwargs.get('headers',{}) | {'Authorization':f'Bearer {self.token}'}
                 json = kwargs.get('json',{})
-                r = requests.delete(url, json=json, headers=headers) if json else requests.get(url, headers=headers)
+                r = requests.delete(url, json=json, headers=headers) if json else requests.delete(url, headers=headers)
                 if r.status_code == 401:
                     logger.warning(f'Received 401 from IFS. Attempting to retreive new token.')
                     self.token = self._get_ifs_token()
@@ -152,5 +152,5 @@ class IfsRequest:
         elif self.auth_type == 'user':
             headers = kwargs.get('headers',{})
             json = kwargs.get('json',{})
-            r = requests.delete(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.get(url, headers=headers, auth=(self.username, self.password))
+            r = requests.delete(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.delete(url, headers=headers, auth=(self.username, self.password))
             return r
