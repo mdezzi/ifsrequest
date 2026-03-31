@@ -4,7 +4,7 @@ To install latest commit directly from Github:
 
     pip install git+https://github.com/mdezzi/ifsrequest.git
 
-To install specific realease from Github:
+To install specific release from Github:
 
     pip install git+https://github.com/mdezzi/ifsrequest.git@0.3
 
