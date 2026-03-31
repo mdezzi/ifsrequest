@@ -1,5 +1,12 @@
 Requests wrapper for making IFS Cloud requests. 
 -
+To install latest commit directly from Github:
+
+    pip install git+https://github.com/mdezzi/ifsrequest.git
+
+To install specific realease from Github:
+
+    pip install git+https://github.com/mdezzi/ifsrequest.git@0.3
 
 To instantiate the class with client auth:
 
