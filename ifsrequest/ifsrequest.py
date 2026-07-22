@@ -94,8 +94,8 @@ class IfsRequest:
             attempts = 0
             while attempts < 3:
                 headers = kwargs.get('headers', {}) | {'Authorization': f'Bearer {self.token}'}
-                json = kwargs.get('json', {})
-                r = requests.post(url, json=json, headers=headers) if json else requests.post(url, headers=headers)
+                json = kwargs.get('json')
+                r = requests.post(url, json=json, headers=headers) if json or json=={} else requests.post(url, headers=headers)
                 if r.status_code == 401:
                     logger.warning('Received 401 from IFS. Attempting to retrieve new token.')
                     self.token = self._get_ifs_token()
@@ -106,8 +106,8 @@ class IfsRequest:
             return r
         elif self.auth_type == 'user':
             headers = kwargs.get('headers', {})
-            json = kwargs.get('json', {})
-            r = requests.post(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.post(url, headers=headers, auth=(self.username, self.password))
+            json = kwargs.get('json')
+            r = requests.post(url, json=json, headers=headers, auth=(self.username, self.password)) if json or json=={} else requests.post(url, headers=headers, auth=(self.username, self.password))
             return r
         else:
             raise RuntimeError('Unsupported auth type')
@@ -118,8 +118,8 @@ class IfsRequest:
             attempts = 0
             while attempts < 3:
                 headers = kwargs.get('headers', {}) | {'Authorization': f'Bearer {self.token}'}
-                json = kwargs.get('json', {})
-                r = requests.patch(url, json=json, headers=headers) if json else requests.patch(url, headers=headers)
+                json = kwargs.get('json')
+                r = requests.patch(url, json=json, headers=headers) if json or json=={} else requests.patch(url, headers=headers)
                 if r.status_code == 401:
                     logger.warning('Received 401 from IFS. Attempting to retrieve new token.')
                     self.token = self._get_ifs_token()
@@ -130,8 +130,8 @@ class IfsRequest:
             return r
         elif self.auth_type == 'user':
             headers = kwargs.get('headers', {})
-            json = kwargs.get('json', {})
-            r = requests.patch(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.patch(url, headers=headers, auth=(self.username, self.password))
+            json = kwargs.get('json')
+            r = requests.patch(url, json=json, headers=headers, auth=(self.username, self.password)) if json or json=={} else requests.patch(url, headers=headers, auth=(self.username, self.password))
             return r
         else:
             raise RuntimeError('Unsupported auth type')
@@ -142,8 +142,8 @@ class IfsRequest:
             attempts = 0
             while attempts < 3:
                 headers = kwargs.get('headers', {}) | {'Authorization': f'Bearer {self.token}'}
-                json = kwargs.get('json', {})
-                r = requests.delete(url, json=json, headers=headers) if json else requests.delete(url, headers=headers)
+                json = kwargs.get('json')
+                r = requests.delete(url, json=json, headers=headers) if json or json=={} else requests.delete(url, headers=headers)
                 if r.status_code == 401:
                     logger.warning('Received 401 from IFS. Attempting to retrieve new token.')
                     self.token = self._get_ifs_token()
@@ -154,8 +154,8 @@ class IfsRequest:
             return r
         elif self.auth_type == 'user':
             headers = kwargs.get('headers', {})
-            json = kwargs.get('json', {})
-            r = requests.delete(url, json=json, headers=headers, auth=(self.username, self.password)) if json else requests.delete(url, headers=headers, auth=(self.username, self.password))
+            json = kwargs.get('json')
+            r = requests.delete(url, json=json, headers=headers, auth=(self.username, self.password)) if json or json=={} else requests.delete(url, headers=headers, auth=(self.username, self.password))
             return r
         else:
             raise RuntimeError('Unsupported auth type')
