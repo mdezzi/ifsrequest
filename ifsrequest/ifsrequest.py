@@ -168,8 +168,8 @@ class IfsRequest:
 
             if response.status_code != 401:
                 logger.debug('Response %s → %s', method.upper(), response.status_code)
-                if not response.ok:
-                    raise IfsRequestError(response.status_code, response.text)
+                # if not response.ok:
+                #     raise IfsRequestError(response.status_code, response.text)
                 return response
 
             # 401 – only client auth can be refreshed
