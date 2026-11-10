@@ -203,3 +203,7 @@ class IfsRequest:
     def delete(self, url: str, **kwargs: Any) -> Response:
         """Send a DELETE request."""
         return self._request('DELETE', url, **kwargs)
+
+    def put(self, url: str, **kwargs: Any) -> Response:
+        """Send a PUT request."""
+        return self._request('PUT', url, **kwargs)
